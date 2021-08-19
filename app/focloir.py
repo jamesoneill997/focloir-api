@@ -1,25 +1,7 @@
-from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.by import By
-import selenium.webdriver.support.expected_conditions as ec
+import requests
+from bs4 import BeautifulSoup
 
 class Focloir:
-    def __init__(self):
-        chrome_options = webdriver.ChromeOptions()
-        chrome_options.add_experimental_option("detach", True)
-        chrome_options.add_argument('--headless')
-        driver = webdriver.Chrome(options=chrome_options) 
-        self.driver = driver
-
-    def search_term(self, term):
-        driver = self.driver
-        url = "https://www.focloir.ie/en/dictionary/ei/"
-        formatted_term = self.format_term(term)
-        driver.get(url+formatted_term)
-        WebDriverWait(driver, timeout=15).until(ec.presence_of_element_located((By.CLASS_NAME, "sense")))
-        print(self.get_translation())
-        return
-
     def format_term(self, term):
         formatted_string = ""
         words = term.split(" ")
@@ -34,10 +16,24 @@ class Focloir:
 
         return formatted_string
 
-    def get_translation(self):
-        driver = self.driver
-        results = driver.find_element(By.CLASS_NAME, 'cit_translation').text
-        if "masc" in results.split(" ")[1] or "fem" in results.split(" ")[1]:
-            return results.split(" ")[0]
-        else:
-            return results
+    def get_translation(self, term):
+        url = "https://www.focloir.ie/en/dictionary/ei/" + self.format_term(term)
+        page = requests.get(url,headers={"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36"}) 
+        results = self.parse_results(page)
+        
+        return results
+
+    def parse_results(self, page):
+        all_word_forms = []
+        soup = BeautifulSoup(page.content, "html.parser")
+        results = soup.find_all("span",class_="cit_translation")
+        for result in results:
+            all_word_forms.append(result.find("span", class_="quote").text)
+        
+        return all_word_forms
+
+def main():
+    focloir = Focloir()
+    print(focloir.get_translation("Hello"))
+if __name__ == "__main__":
+    main()
