@@ -1,5 +1,4 @@
 import requests
-import pprint
 from bs4 import BeautifulSoup
 
 class Focloir:
@@ -19,6 +18,7 @@ class Focloir:
 
     def translate(self, term):
         url = "https://www.focloir.ie/en/dictionary/ei/" + self.format_term(term)
+        #setting headers spoofs a browser session
         page = requests.get(url,headers={"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36"}) 
         results = self.parse_results(page)
         
@@ -86,23 +86,3 @@ class Focloir:
         except AttributeError:
             ex = "None"
         return ex
-
-def main():
-    focloir = Focloir()
-    pp = pprint.PrettyPrinter(indent=2)
-    pp.pprint(focloir.translate("dog"))
-if __name__ == "__main__":
-    main()
-#{
-
- #   "ciorclach": {
-  #      "type": "Adjective",
-   #     "declension" : "adj1",
-    #    "gender": "masc",
-       # "Example":"it has a circular shape - ta cruth ciorclach air"
-     #   "context":"Of Shape",
-    #}, 
-    #"cruinn": {
-    
-    #}
-#}
