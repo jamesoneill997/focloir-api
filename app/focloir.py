@@ -27,7 +27,7 @@ class Focloir:
     def parse_results(self, page):
         all_word_forms = {}
         soup = BeautifulSoup(page.content, "html.parser")
-        results = soup.find_all("span", class_="sense")
+        results = soup.find_all("span", class_="sense", limit=3)
         
         for result in results:
             translation = self.get_translation(result)
@@ -71,8 +71,8 @@ class Focloir:
 
 def main():
     focloir = Focloir()
-    pp = pprint.PrettyPrinter(indent=4)
-    pp.pprint(focloir.translate("window"))    
+    pp = pprint.PrettyPrinter(indent=2)
+    pp.pprint(focloir.translate("cat"))    
 if __name__ == "__main__":
     main()
 #{
