@@ -38,7 +38,7 @@ class Focloir:
             context = self.get_context(result)
             type = self.get_type(result)
             decl = self.get_declension(result)
-            gender = self.get_gender(result)
+            gender = self.get_gender(decl)
             example = self.get_example(result)
             all_word_forms[translation].append({"context":context, "type":type, "declension":decl, "gender":gender, "example":example})
 
@@ -56,10 +56,10 @@ class Focloir:
     def get_context(self, result):
         try:
             context = result.find("span",class_="EDMEANING")
-            result = context.text
+            ctx = context.text
         except AttributeError:
-            result = "Undefined"
-        return result
+            ctx = "Undefined"
+        return ctx
     
     def get_type(self, result):
         try:
@@ -69,16 +69,28 @@ class Focloir:
         return type
 
     def get_declension(self, result):
-        return ""
-    def get_gender(self, result):
-        return ""
+        try:
+            declension = result.find("span", class_="lbl_black_i")
+            decl = declension.text
+        except AttributeError:
+            decl = "Undefined"
+        return decl
+    
+    def get_gender(self, decl):
+        return decl if decl == "Undefined" else decl[:-1]
+    
     def get_example(self, result):
-        return ""
+        try:
+            example = result.find("span", class_="cit_example")
+            ex = example.find("span", class_="quote").text
+        except AttributeError:
+            ex = "None"
+        return ex
 
 def main():
     focloir = Focloir()
     pp = pprint.PrettyPrinter(indent=2)
-    pp.pprint(focloir.translate("cat"))    
+    pp.pprint(focloir.translate("dog"))
 if __name__ == "__main__":
     main()
 #{
