@@ -1,4 +1,5 @@
 import requests
+import pprint
 from bs4 import BeautifulSoup
 
 class Focloir:
@@ -16,7 +17,7 @@ class Focloir:
 
         return formatted_string
 
-    def get_translation(self, term):
+    def translate(self, term):
         url = "https://www.focloir.ie/en/dictionary/ei/" + self.format_term(term)
         page = requests.get(url,headers={"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36"}) 
         results = self.parse_results(page)
@@ -24,16 +25,66 @@ class Focloir:
         return results
 
     def parse_results(self, page):
-        all_word_forms = []
+        all_word_forms = {}
         soup = BeautifulSoup(page.content, "html.parser")
-        results = soup.find_all("span",class_="cit_translation")
-        for result in results:
-            all_word_forms.append(result.find("span", class_="quote").text)
+        results = soup.find_all("span", class_="sense")
         
+        for result in results:
+            translation = self.get_translation(result)
+            #skip unwanted tranlslations
+            if translation == None:
+                continue
+            all_word_forms[translation] = []
+            context = self.get_context(result)
+            type = self.get_type(result)
+            decl = self.get_declension(result)
+            gender = self.get_gender(result)
+            example = self.get_example(result)
+            all_word_forms[translation].append({"context":context, "type":type, "declension":decl, "gender":gender, "example":example})
+
         return all_word_forms
+
+    def get_translation(self, result):
+        try:
+            translation = result.find("span",class_="cit_translation")
+            result = translation.find("span", class_="quote").text
+        except AttributeError:
+            return None
+            
+        return result
+        
+    def get_context(self, result):
+        return
+    def get_type(self, result):
+        try:
+            type = result.find("span", class_="pos").text
+        except AttributeError:
+            type = "Undefined"
+        return type
+
+    def get_declension(self, result):
+        return ""
+    def get_gender(self, result):
+        return ""
+    def get_example(self, result):
+        return ""
 
 def main():
     focloir = Focloir()
-    print(focloir.get_translation("Hello"))
+    pp = pprint.PrettyPrinter(indent=4)
+    pp.pprint(focloir.translate("window"))    
 if __name__ == "__main__":
     main()
+#{
+
+ #   "ciorclach": {
+  #      "type": "Adjective",
+   #     "declension" : "adj1",
+    #    "gender": "masc",
+       # "Example":"it has a circular shape - ta cruth ciorclach air"
+     #   "context":"Of Shape",
+    #}, 
+    #"cruinn": {
+    
+    #}
+#}
