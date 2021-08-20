@@ -54,7 +54,13 @@ class Focloir:
         return result
         
     def get_context(self, result):
-        return
+        try:
+            context = result.find("span",class_="EDMEANING")
+            result = context.text
+        except AttributeError:
+            result = "Undefined"
+        return result
+    
     def get_type(self, result):
         try:
             type = result.find("span", class_="pos").text
