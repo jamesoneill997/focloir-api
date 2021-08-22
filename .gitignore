@@ -1,0 +1,4 @@
+app/tests/words_with_no_translation.txt
+*/__init__.py
+__pycache__
+Procfile
