@@ -1,5 +1,5 @@
 from flask import Flask
-from focloir import Focloir
+from .focloir import Focloir
 app = Flask(__name__)
 
 @app.route("/translate/<word>")
